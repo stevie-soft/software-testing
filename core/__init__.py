@@ -1,7 +1,7 @@
-from .webpage import WebPage
-from .webpage_element import WebPageElement
+from .interactive_html import HtmlElement, DomElement, WebPage
 
 __all__ = [
     "WebPage",
-    "WebPageElement",
+    "HtmlElement",
+    "DomElement",
 ]

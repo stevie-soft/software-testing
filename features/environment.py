@@ -1,5 +1,8 @@
+from typing import cast
+
 from behave.runner import Context
 
+from features.context import AutomationExerciseContext
 from sites.automationexercise.website import AutomationExerciseWebsite
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -13,6 +16,7 @@ driver = webdriver.Chrome(options)
 
 
 def before_all(context: Context):
+    context = cast(AutomationExerciseContext, context)
     context.site = AutomationExerciseWebsite(driver)
 
 

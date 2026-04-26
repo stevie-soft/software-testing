@@ -1,11 +1,10 @@
 Feature: User Signup
   Background:
-    Given the home page is opened
+    Given the login page is opened
+    And the cookie modal is closed
 
-    Scenario Outline: First test
-      Given the name field is filled with '<name>'
-      And the 'email' field is filled with '<email>'
-      Then the browser quits
-      Examples:
-        | name | email
-        | Test User | testing100@testing100.com
+    Scenario: Register user
+      Given the name entered is 'Test User 1'
+      And the email entered is 'testing100@testing100.com'
+      When the signup form is sent
+      Then the account form appears
