@@ -4,14 +4,14 @@ from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 
 
 class DomElement:
     def __init__(
         self,
-        _type: Literal["input", "button"],
+        _type: Literal["input", "button", "select", "h2"],
         _attributes: dict[str, str],
         /,
     ) -> None:
@@ -62,6 +62,14 @@ class _HtmlUtils:
     def has_cookie(self, cookie_name: str) -> bool:
         return self.driver.get_cookie(cookie_name) is not None  # type: ignore
 
+    def set_option_by_value(self, dom_elem: DomElement, option_value: str) -> None:
+        select = Select(self.find_visible(dom_elem))
+        select.select_by_value(option_value)
+
+    def set_option_by_text(self, dom_elem: DomElement, option_value: str) -> None:
+        select = Select(self.find_visible(dom_elem))
+        select.select_by_visible_text(option_value)
+
     def type_into(
         self,
         dom_elem: DomElement,
@@ -79,6 +87,11 @@ class _HtmlUtils:
 class HtmlElement:
     def __init__(self, driver: WebDriver) -> None:
         self.html = _HtmlUtils(driver)
+
+
+class HtmlForm(HtmlElement):
+    FIELDS = {}
+    BUTTONS = {}
 
 
 class WebPage(HtmlElement):
