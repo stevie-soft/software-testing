@@ -1,31 +1,30 @@
-from core import DomElement, HtmlElement
+from core import HtmlElement
 
 
 class SignupForm(HtmlElement):
-    NAME_FIELD = DomElement(
-        "input",
-        {
-            "data-qa": "signup-name",
-        },
-    )
-    EMAIL_FIELD = DomElement(
-        "input",
-        {
-            "data-qa": "signup-email",
-        },
-    )
-    SIGNUP_BUTTON = DomElement(
-        "button",
-        {
-            "data-qa": "signup-button",
-        },
-    )
-
-    def enter_name(self, name: str) -> None:
-        self.html.fill(self.NAME_FIELD, name)
-
-    def enter_email(self, email: str) -> None:
-        self.html.fill(self.EMAIL_FIELD, email)
-
-    def send(self) -> None:
-        self.html.click_on(self.SIGNUP_BUTTON)
+    ELEMENTS = {
+        # region: FORM FIELDS
+        "Name": ("input", {"data-qa": "signup-name"}),
+        "Email": ("input", {"data-qa": "signup-email"}),
+        "Password": ("input", {"data-qa": "password"}),
+        "Day of Birth": ("select", {"data-qa": "days"}),
+        "Month of Birth": ("select", {"data-qa": "months"}),
+        "Year of Birth": ("select", {"data-qa": "years"}),
+        "First name": ("input", {"data-qa": "first_name"}),
+        "Last name": ("input", {"data-qa": "last_name"}),
+        "Address": ("input", {"data-qa": "address"}),
+        "Country": ("select", {"data-qa": "country"}),
+        "State": ("input", {"data-qa": "state"}),
+        "City": ("input", {"data-qa": "city"}),
+        "Zipcode": ("input", {"data-qa": "zipcode"}),
+        "Mobile Number": ("input", {"data-qa": "mobile_number"}),
+        # endregion
+        #
+        # region: BUTTONS
+        "Signup": ("button", {"data-qa": "signup-button"}),
+        # endregion
+        #
+        # region: TEXTS
+        "Error Message": ("p", {"style": "color: red;"}),
+        # endregion
+    }

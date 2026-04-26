@@ -7,91 +7,97 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 
+type DomElementMeta = tuple[
+    Literal["input", "button", "select", "a", "p"],
+    dict[str, str],
+]
+
+
+def _meta_as_selector(meta: DomElementMeta) -> str:
+    [tag_name, tag_attributes] = meta
+
+    selector = tag_name
+
+    for key, value in tag_attributes.items():
+        selector += f'[{key}="{value}"]'
+
+    return selector
+
 
 class DomElement:
     def __init__(
         self,
-        _type: Literal["input", "button", "select", "h2"],
-        _attributes: dict[str, str],
-        /,
+        driver: WebDriver,
+        selector: str,
+        timeout_seconds: float = 10.0,
     ) -> None:
-        self.locator = (
+        self.__wait = WebDriverWait(driver, timeout_seconds)
+        self.__locator = (
             By.CSS_SELECTOR,
-            f"{_type}{self.__attributes_as_selector(_attributes)}",
+            selector,
         )
 
-    @staticmethod
-    def __attributes_as_selector(attributes: dict[str, str]) -> str:
-        selector = ""
+    def fill(self, value: str) -> None:
+        self.send_keys(value, replace=True)
 
-        for key, value in attributes.items():
-            selector += f'[{key}="{value}"]'
-
-        return selector
-
-
-class _HtmlUtils:
-    def __init__(
+    def send_keys(
         self,
-        driver: WebDriver,
-        default_timeout_seconds: float = 10.0,
+        value: str | int | float,
+        replace: bool = False,
     ) -> None:
-        self.driver = driver
-        self.__wait = WebDriverWait(driver, default_timeout_seconds)
+        if replace:
+            self.__as_visible_web_element.clear()
 
-    def find_visible(self, dom_elem: DomElement) -> WebElement:
-        return self.__wait.until(EC.visibility_of_element_located(dom_elem.locator))
+        self.__as_visible_web_element.send_keys(str(value))
 
-    def find_clickable(self, dom_elem: DomElement) -> WebElement:
-        return self.__wait.until(EC.element_to_be_clickable(dom_elem.locator))
+    def click(self) -> None:
+        self.__as_clickable_web_element.click()
 
-    def is_clickable(self, dom_elem: DomElement) -> bool:
+    def set(self, value: str) -> None:
+        self.__as_select_web_element.select_by_visible_text(value)
+
+    def says(self, value: str) -> bool:
+        return self.__as_visible_web_element.text.lower() == value
+
+    def is_visible(self) -> bool:
         try:
-            self.find_clickable(dom_elem)
+            self.__as_visible_web_element
             return True
         except TimeoutException:
             return False
 
-    def click_on(self, dom_elem: DomElement) -> None:
-        web_elem = self.find_clickable(dom_elem)
-        web_elem.click()
+    def is_clickable(self) -> bool:
+        try:
+            self.__as_clickable_web_element
+            return True
+        except TimeoutException:
+            return False
 
-    def fill(self, dom_elem: DomElement, value: str | int | float) -> None:
-        self.type_into(dom_elem, value, replace=True)
+    @property
+    def __as_visible_web_element(self) -> WebElement:
+        return self.__wait.until(EC.visibility_of_element_located(self.__locator))
 
-    def has_cookie(self, cookie_name: str) -> bool:
-        return self.driver.get_cookie(cookie_name) is not None  # type: ignore
+    @property
+    def __as_clickable_web_element(self) -> WebElement:
+        return self.__wait.until(EC.element_to_be_clickable(self.__locator))
 
-    def set_option_by_value(self, dom_elem: DomElement, option_value: str) -> None:
-        select = Select(self.find_visible(dom_elem))
-        select.select_by_value(option_value)
-
-    def set_option_by_text(self, dom_elem: DomElement, option_value: str) -> None:
-        select = Select(self.find_visible(dom_elem))
-        select.select_by_visible_text(option_value)
-
-    def type_into(
-        self,
-        dom_elem: DomElement,
-        value: str | int | float,
-        replace: bool = False,
-    ) -> None:
-        web_elem = self.find_visible(dom_elem)
-
-        if replace:
-            web_elem.clear()
-
-        web_elem.send_keys(str(value))
+    @property
+    def __as_select_web_element(self) -> Select:
+        return Select(self.__as_visible_web_element)
 
 
 class HtmlElement:
+    ELEMENTS: dict[str, DomElementMeta] = {}
+
     def __init__(self, driver: WebDriver) -> None:
-        self.html = _HtmlUtils(driver)
+        self.driver = driver
+        self.elements: dict[str, DomElement] = {}
 
-
-class HtmlForm(HtmlElement):
-    FIELDS = {}
-    BUTTONS = {}
+        for ref, meta in self.ELEMENTS.items():
+            self.elements[ref] = DomElement(
+                driver=driver,
+                selector=_meta_as_selector(meta),
+            )
 
 
 class WebPage(HtmlElement):
@@ -99,4 +105,4 @@ class WebPage(HtmlElement):
     SUBPATH = ""
 
     def visit(self):
-        self.html.driver.get(f"{self.URL}/{self.SUBPATH}")
+        self.driver.get(f"{self.URL}/{self.SUBPATH}")

@@ -1,17 +1,11 @@
-from core import DomElement, HtmlElement
+from core import HtmlElement
 
 
 class CookieModal(HtmlElement):
-    ACCEPT_BUTTON = DomElement(
-        "button",
-        {
-            "aria-label": "Beleegyezés",
-        },
-    )
+    ELEMENTS = {"Consent": ("button", {"aria-label": "Beleegyezés"})}
 
     def accept(self) -> None:
-        self.html.click_on(self.ACCEPT_BUTTON)
+        self.elements["Consent"].click()
 
-    @property
-    def is_accepted(self) -> bool:
-        return self.html.has_cookie("__gads")
+    def is_visible(self) -> bool:
+        return self.elements["Consent"].is_visible()
