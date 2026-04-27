@@ -46,4 +46,4 @@ def check_text(
     text: str,
 ):
     context = cast(AutomationExerciseContext, context)
-    assert context.site.scopes[scope_key].elements[element_key].says(text) is True
+    assert context.site.scopes[scope_key].elements[element_key].says(text)

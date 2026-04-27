@@ -1,7 +1,7 @@
 from typing import Literal
 
-from selenium.common import TimeoutException
-from selenium.webdriver.common.by import By
+from selenium.common import StaleElementReferenceException, TimeoutException
+from selenium.webdriver.common.by import By, ByType
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -28,13 +28,18 @@ class DomElement:
     def __init__(
         self,
         driver: WebDriver,
-        selector: str,
+        matcher: str,
+        matcher_type: ByType = By.CSS_SELECTOR,
         timeout_seconds: float = 10.0,
     ) -> None:
-        self.__wait = WebDriverWait(driver, timeout_seconds)
+        self.__wait = WebDriverWait(
+            driver,
+            timeout_seconds,
+            ignored_exceptions=(StaleElementReferenceException,),
+        )
         self.__locator = (
-            By.CSS_SELECTOR,
-            selector,
+            matcher_type,
+            matcher,
         )
 
     def fill(self, value: str) -> None:
@@ -57,7 +62,11 @@ class DomElement:
         self.__as_select_web_element.select_by_visible_text(value)
 
     def says(self, value: str) -> bool:
-        return self.__as_visible_web_element.text.lower() == value
+        return self.__wait.until(lambda _: value.lower() in self.text.lower())
+
+    @property
+    def text(self) -> str:
+        return self.__as_visible_web_element.text
 
     def is_visible(self) -> bool:
         try:
@@ -96,7 +105,7 @@ class HtmlElement:
         for ref, meta in self.ELEMENTS.items():
             self.elements[ref] = DomElement(
                 driver=driver,
-                selector=_meta_as_selector(meta),
+                matcher=_meta_as_selector(meta),
             )
 
 
