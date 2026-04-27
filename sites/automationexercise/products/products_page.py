@@ -1,5 +1,5 @@
-from core import WebPage
+from sites.automationexercise.website import HomePage
 
 
-class ProductsPage(WebPage):
+class ProductsPage(HomePage):
     SUBPATH = "products"

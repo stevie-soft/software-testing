@@ -9,6 +9,7 @@ from sites.automationexercise.login.login_form import LoginForm
 from sites.automationexercise.login.login_page import LoginPage
 from sites.automationexercise.login.signup_form import SignupForm
 from sites.automationexercise.products.products_page import ProductsPage
+from sites.automationexercise.products.search_products_form import SearchProductsForm
 from sites.automationexercise.signup.account_form import AccountForm
 
 
@@ -25,6 +26,7 @@ class AutomationExerciseWebsite:
             "Account Form": AccountForm(driver),
             "Signup Form": SignupForm(driver),
             "Login Form": LoginForm(driver),
+            "Search Products Form": SearchProductsForm(driver),
         }
         self.cookie_modal = CookieModal(driver)
         self.navbar = NavBar(driver)
@@ -40,6 +42,10 @@ class AutomationExerciseWebsite:
 
     def has_cookie(self, cookie_name: str) -> bool:
         return self.driver.get_cookie(cookie_name) is not None  # type: ignore
+
+    def count(self, selector: str) -> int:
+        web_elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+        return len(web_elements)
 
     def close_ads(self) -> None:
         script = """
