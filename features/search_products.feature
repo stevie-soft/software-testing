@@ -18,3 +18,16 @@ Feature: Search products
       | white | 3 |
       | green | 3 |
       | purple | 0 |
+
+  Scenario Outline: Filter brands
+    Given the 'Products' page is opened
+    When the button 'Brand <brand>' of 'Search Products Form' is clicked
+    Then '<products>' products appear
+    Examples:
+      | brand | products | 
+      | POLO | 6 |
+      | H&M | 5 |
+      | Madame | 5 |
+      | Babyhug | 4 |
+      | Kookie Kids | 3 |
+      | Biba | 5 |
