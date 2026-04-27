@@ -31,3 +31,16 @@ Feature: Search products
       | Babyhug | 4 |
       | Kookie Kids | 3 |
       | Biba | 5 |
+
+  Scenario Outline: Toggle categories
+    Given the 'Products' page is opened
+    When the button 'Category <category>' of 'Search Products Form' is clicked
+    Then the element '<subcategory>' of 'Search Products Form' becomes clickable
+    Examples:
+      | category | subcategory |
+      | Women | Women Saree |
+      | Women | Women Tops |
+      | Men | Men Shirts |
+      | Men | Men Jeans |
+      | Kids | Kids Dress |
+      | Kids | Kids Clothes |

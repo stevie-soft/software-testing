@@ -47,3 +47,13 @@ def check_text(
 ):
     context = cast(AutomationExerciseContext, context)
     assert context.site.scopes[scope_key].elements[element_key].says(text)
+
+
+@step("the element '{element_key}' of '{scope_key}' becomes clickable")
+def check_clickable(
+    context: Context,
+    scope_key: str,
+    element_key: str,
+):
+    context = cast(AutomationExerciseContext, context)
+    assert context.site.scopes[scope_key].elements[element_key].is_clickable()
