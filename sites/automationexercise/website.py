@@ -2,9 +2,10 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 
 from core import DomElement
+from sites.automationexercise.home.home_page import HomePage
+from sites.automationexercise.cart.cart_page import CartPage
 from sites.automationexercise.common.cookie_modal import CookieModal
 from sites.automationexercise.common.navbar import NavBar
-from sites.automationexercise.home.home_page import HomePage
 from sites.automationexercise.login.login_form import LoginForm
 from sites.automationexercise.login.login_page import LoginPage
 from sites.automationexercise.login.signup_form import SignupForm
@@ -20,6 +21,7 @@ class AutomationExerciseWebsite:
             "Home": HomePage(driver),
             "Login": LoginPage(driver),
             "Products": ProductsPage(driver),
+            "Cart": CartPage(driver),
         }
         self.scopes = {
             "Navbar": NavBar(driver),
